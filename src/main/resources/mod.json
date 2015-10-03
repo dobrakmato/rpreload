@@ -1,0 +1,10 @@
+{
+  "name": "${project.name}",
+  "version": "${project.version}",
+  "author": "Matej Kormuth",
+  "modules": [
+    "eu.matejkormuth.rpreload.configuration.ConfigurationsModule",
+    "eu.matejkormuth.rpreload.filestorage.FileStorageModule",
+    "eu.matejkormuth.rpreload.resourcepack.ResourcePackModule"
+  ]
+}
