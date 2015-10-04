@@ -2,17 +2,17 @@
  * rpreload - Resource pack management made easy.
  * Copyright (c) 2015, Matej Kormuth <http://www.github.com/dobrakmato>
  * All rights reserved.
- *
+ * <p>
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
- *
+ * <p>
  * 1. Redistributions of source code must retain the above copyright notice, this
  * list of conditions and the following disclaimer.
- *
+ * <p>
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  * this list of conditions and the following disclaimer in the documentation and/or
  * other materials provided with the distribution.
- *
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,11 +27,14 @@
 package eu.matejkormuth.bmboot.internal;
 
 import com.google.common.base.Joiner;
-import eu.matejkormuth.bmboot.facades.Container;
 import eu.matejkormuth.bmboot.JarUtils;
 import eu.matejkormuth.bmboot.ModJson;
 import eu.matejkormuth.bmboot.commands.BMBootCommandExecutor;
+import eu.matejkormuth.bmboot.facades.Container;
+import org.bukkit.Server;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitScheduler;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,6 +84,12 @@ public final class BukkitPlugin extends JavaPlugin {
         // Create Container.
         container = new AppContainer();
         Container.swap(this.container);
+
+        // Insert some useful values into container.
+        Container.put(JavaPlugin.class, this);
+        Container.put(Plugin.class, this);
+        Container.put(Server.class, getServer());
+        Container.put(BukkitScheduler.class, getServer().getScheduler());
 
         // Register command.
         getCommand("bmboot").setExecutor(new BMBootCommandExecutor(this));
