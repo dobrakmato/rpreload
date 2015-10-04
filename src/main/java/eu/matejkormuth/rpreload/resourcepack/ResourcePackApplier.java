@@ -24,34 +24,49 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.matejkormuth.rpreload.resourcepack.commands;
+package eu.matejkormuth.rpreload.resourcepack;
 
-import eu.matejkormuth.bmboot.facades.Container;
-import eu.matejkormuth.rpreload.commands.Command;
-import eu.matejkormuth.rpreload.commands.CommandArgs;
-import eu.matejkormuth.rpreload.resourcepack.ResourcePackApplier;
-import org.bukkit.Server;
-import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RpReloadAllCommand extends Command {
+import javax.annotation.Nonnull;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
-    private static final Logger log = LoggerFactory.getLogger(RpReloadAllCommand.class);
+/**
+ * Applies resource pack to player.
+ */
+public class ResourcePackApplier {
 
-    @Override
-    protected boolean onExecute(CommandSender sender, CommandArgs args) {
+    private static final Logger log = LoggerFactory.getLogger(ResourcePackApplier.class);
 
-        log.info("Reloading resource pack for all players...");
+    // Player last resource packs.
+    private final Map<UUID, String> lastResourcePacks = new HashMap<>();
 
-        // Get applier object.
-        ResourcePackApplier applier = Container.get(ResourcePackApplier.class);
-        // Send new resource pack to all players.
-        Container.get(Server.class)
-                .getOnlinePlayers()
-                .stream()
-                .forEach(player -> applier.apply(player, true));
+    private final ResourcePackModule rpm;
 
-        return true;
+    public ResourcePackApplier(ResourcePackModule resourcePackModule) {
+        this.rpm = resourcePackModule;
+    }
+
+    public void apply(@Nonnull Player player, boolean force) {
+        String url = rpm.getResolver().process(player);
+        apply(player, url, force);
+    }
+
+    private void apply(@Nonnull Player player, @Nonnull String url, boolean force) {
+        // Null check hidden here.
+        if (force || !url.equals(lastResourcePacks.get(player.getUniqueId()))) {
+            log.info("Sending resource pack {} to player {}.", url, player.getName());
+            player.setResourcePack(url);
+            // Update last resource pack.
+            lastResourcePacks.put(player.getUniqueId(), url);
+        }
+    }
+
+    public void clean(Player player) {
+        lastResourcePacks.remove(player.getUniqueId());
     }
 }

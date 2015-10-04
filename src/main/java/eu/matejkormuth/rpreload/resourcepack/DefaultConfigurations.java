@@ -24,34 +24,22 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package eu.matejkormuth.rpreload.resourcepack.commands;
+package eu.matejkormuth.rpreload.resourcepack;
 
-import eu.matejkormuth.bmboot.facades.Container;
-import eu.matejkormuth.rpreload.commands.Command;
-import eu.matejkormuth.rpreload.commands.CommandArgs;
-import eu.matejkormuth.rpreload.resourcepack.ResourcePackApplier;
-import org.bukkit.Server;
-import org.bukkit.command.CommandSender;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.bukkit.configuration.file.YamlConfiguration;
 
-public class RpReloadAllCommand extends Command {
+public class DefaultConfigurations {
+    private DefaultConfigurations() {
+    }
 
-    private static final Logger log = LoggerFactory.getLogger(RpReloadAllCommand.class);
+    public static YamlConfiguration RESOURCE_PACKS = new YamlConfiguration();
+    public static YamlConfiguration WORLD_PACKS = new YamlConfiguration();
+    public static YamlConfiguration PLAYER_PACKS = new YamlConfiguration();
 
-    @Override
-    protected boolean onExecute(CommandSender sender, CommandArgs args) {
+    static {
+        RESOURCE_PACKS.set("_empty", "http://path.to/empty_resourcepack.zip");
+        RESOURCE_PACKS.set("resourcepack_name", "http://path.to/resourcepack.zip");
 
-        log.info("Reloading resource pack for all players...");
-
-        // Get applier object.
-        ResourcePackApplier applier = Container.get(ResourcePackApplier.class);
-        // Send new resource pack to all players.
-        Container.get(Server.class)
-                .getOnlinePlayers()
-                .stream()
-                .forEach(player -> applier.apply(player, true));
-
-        return true;
+        WORLD_PACKS.set("world_name", "resourcepack_name");
     }
 }

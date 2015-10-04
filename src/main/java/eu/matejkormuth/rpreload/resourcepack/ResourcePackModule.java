@@ -2,17 +2,17 @@
  * rpreload - Resource pack management made easy.
  * Copyright (c) 2015, Matej Kormuth <http://www.github.com/dobrakmato>
  * All rights reserved.
- * <p>
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
- * <p>
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
  * list of conditions and the following disclaimer.
- * <p>
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  * this list of conditions and the following disclaimer in the documentation and/or
  * other materials provided with the distribution.
- * <p>
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -62,14 +62,27 @@ public class ResourcePackModule extends Module {
     // Mapping world_name -> resourcepack_name.
     private YamlConfiguration worldPacks;
 
+    // Mapping uuid -> resourcepack_name.
+    private YamlConfiguration playerPacks;
+
     // Resource pack resolver.
     private Chain<Player, String> resolver;
 
     @Override
     public void onEnable() {
         // Load configurations.
-        resourcePacks = configurationsModule.loadOrCreate("resourcepacks", new YamlConfiguration());
-        worldPacks = configurationsModule.loadOrCreate("worlds", new YamlConfiguration());
+        resourcePacks = configurationsModule.loadOrCreate("resourcepacks", DefaultConfigurations.RESOURCE_PACKS);
+        worldPacks = configurationsModule.loadOrCreate("worlds", DefaultConfigurations.WORLD_PACKS);
+        playerPacks = configurationsModule.loadOrCreate("players", DefaultConfigurations.PLAYER_PACKS);
+
+        // Check for default empty resource pack.
+        if (!resourcePacks.contains("_empty")) {
+            log.error("Default '_empty' resource pack was not found in resourcepacks.yml configuration file!");
+            log.error("Plugin may not work correctly!");
+        }
+
+        // Create applier.
+        Container.put(ResourcePackApplier.class, new ResourcePackApplier(this));
 
         // Check resource packs asynchronously.
         Container.get(BukkitScheduler.class)
@@ -116,5 +129,17 @@ public class ResourcePackModule extends Module {
 
     public Chain<Player, String> getResolver() {
         return resolver;
+    }
+
+    public YamlConfiguration getResourcePacks() {
+        return resourcePacks;
+    }
+
+    public YamlConfiguration getWorldPacks() {
+        return worldPacks;
+    }
+
+    public YamlConfiguration getPlayerPacks() {
+        return playerPacks;
     }
 }
