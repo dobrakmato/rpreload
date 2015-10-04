@@ -66,7 +66,7 @@ public class ResourcePackApplier {
         }
     }
 
-    public void clean(Player player) {
+    public void clean(@Nonnull Player player) {
         lastResourcePacks.remove(player.getUniqueId());
     }
 }

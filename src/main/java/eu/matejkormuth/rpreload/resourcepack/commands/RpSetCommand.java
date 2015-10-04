@@ -26,13 +26,35 @@
  */
 package eu.matejkormuth.rpreload.resourcepack.commands;
 
+import eu.matejkormuth.bmboot.facades.Container;
 import eu.matejkormuth.rpreload.commands.Command;
 import eu.matejkormuth.rpreload.commands.CommandArgs;
+import eu.matejkormuth.rpreload.resourcepack.ResourcePackApplier;
+import eu.matejkormuth.rpreload.resourcepack.ResourcePackModule;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class RpSetCommand extends Command {
     @Override
     protected boolean onExecute(CommandSender sender, CommandArgs args) {
-        return false;
+        if (sender instanceof Player) {
+            String rpName = args.next();
+            ResourcePackModule rpm = Container.get(ResourcePackModule.class);
+            // Check if name is valid.
+            if (rpm.getResourcePacks().contains(rpName)) {
+                // Set preferred resource pack.
+                Container.get(ResourcePackModule.class)
+                        .getPlayerPacks()
+                        .set(((Player) sender).getUniqueId().toString(), rpName);
+                // Set desired resource pack in this session.
+                Container.get(ResourcePackApplier.class).apply((Player) sender, true);
+                sender.sendMessage(ChatColor.GREEN + "Resource pack set.");
+            } else {
+                sender.sendMessage(ChatColor.RED + String.format("Specified resource pack ('%s') was not found!",
+                        rpName));
+            }
+        }
+        return true;
     }
 }
