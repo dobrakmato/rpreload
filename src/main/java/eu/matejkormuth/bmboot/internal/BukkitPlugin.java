@@ -120,9 +120,11 @@ public final class BukkitPlugin extends JavaPlugin {
         log.info("By using this plugin you agree to it's license.");
         String[] lines = JarUtils.readFile(licenseFile).split("\n");
 
+        log.info("===============================================");
         for (String line : lines) {
             log.info(line);
         }
+        log.info("===============================================");
     }
 
     /**
@@ -156,7 +158,12 @@ public final class BukkitPlugin extends JavaPlugin {
                 Object instance = ctr.newInstance();
 
                 if (instance instanceof Module) {
+                    Class moduleClass = ((Module) instance).getClass();
+
                     instances.add((Module) instance);
+
+                    // This nice unchecked should work.
+                    Container.put(moduleClass, instance);
                 } else {
                     log.error("Specified class {} is not sub class of Module!", clazz.getName());
                 }

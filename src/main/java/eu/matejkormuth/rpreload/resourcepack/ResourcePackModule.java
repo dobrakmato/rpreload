@@ -2,17 +2,17 @@
  * rpreload - Resource pack management made easy.
  * Copyright (c) 2015, Matej Kormuth <http://www.github.com/dobrakmato>
  * All rights reserved.
- *
+ * <p>
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
- *
+ * <p>
  * 1. Redistributions of source code must retain the above copyright notice, this
  * list of conditions and the following disclaimer.
- *
+ * <p>
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  * this list of conditions and the following disclaimer in the documentation and/or
  * other materials provided with the distribution.
- *
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -31,6 +31,7 @@ import eu.matejkormuth.bmboot.facades.Container;
 import eu.matejkormuth.bmboot.internal.Module;
 import eu.matejkormuth.rpreload.commands.CommandsModule;
 import eu.matejkormuth.rpreload.configuration.ConfigurationsModule;
+import eu.matejkormuth.rpreload.filestorage.FileStorageModule;
 import eu.matejkormuth.rpreload.resourcepack.commands.RpHelpCommand;
 import eu.matejkormuth.rpreload.resourcepack.commands.RpReloadAllCommand;
 import eu.matejkormuth.rpreload.resourcepack.commands.RpSetCommand;
@@ -46,6 +47,10 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
 public class ResourcePackModule extends Module {
 
     private static final Logger log = LoggerFactory.getLogger(ResourcePackModule.class);
@@ -55,6 +60,9 @@ public class ResourcePackModule extends Module {
 
     @Dependency
     private CommandsModule commandsModule;
+
+    @Dependency
+    private FileStorageModule fileStorageModule;
 
     // Mapping: resourcepack_name -> url.
     private YamlConfiguration resourcePacks;
@@ -79,6 +87,29 @@ public class ResourcePackModule extends Module {
         if (!resourcePacks.contains("_empty")) {
             log.error("Default '_empty' resource pack was not found in resourcepacks.yml configuration file!");
             log.error("Plugin may not work correctly!");
+        }
+
+        // Check server.properties file.
+        try {
+            Properties properties = new Properties();
+            properties.load(new FileInputStream(fileStorageModule.getPath("..", "..", "server.properties").toFile()));
+
+            if (properties.containsKey("resource-pack") && !properties.getProperty("resource-pack").isEmpty()) {
+                log.error("==============================================");
+                log.error("| Resource pack is set in server.properties! |");
+                log.error("| This may cause trouble by silently overri- |");
+                log.error("|  ding this plugin. Remove 'resource-pack'  |");
+                log.error("|       property from server.properties!     |");
+                log.error("==============================================");
+            }
+        } catch (IOException e) {
+            log.error("==============================================");
+            log.error("|    Can't check server.properties. If you   |");
+            log.error("|      enabled server resource pack in       |");
+            log.error("|      server.properties, this plugin        |");
+            log.error("|                may not work!               |");
+            log.error("==============================================");
+
         }
 
         // Create applier.
@@ -119,7 +150,7 @@ public class ResourcePackModule extends Module {
                 .filter(ResourcePackChecker.Status::isError)
                 .forEach(status -> log.error("Resource pack {} will be broken on clients! Reason: {}.",
                         status.getUrl(), status.getMessage()));
-        log.info("All resource pack were checked!");
+        log.info("All resource packs were checked!");
     }
 
     @Override

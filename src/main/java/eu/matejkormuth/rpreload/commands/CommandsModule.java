@@ -60,12 +60,16 @@ public class CommandsModule extends Module {
             Class<SimplePluginManager> spmClass = SimplePluginManager.class;
             Field scmField = spmClass.getDeclaredField("commandMap");
 
+            if (!scmField.isAccessible()) {
+                scmField.setAccessible(true);
+            }
+
             // Retrieve value.
             Object val = scmField.get(pm);
 
             this.commandMap = (CommandMap) val;
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            log.error("Can't retrieve Bukkit commandMap using reflection! Commands may not work!");
+            log.error("Can't retrieve Bukkit commandMap using reflection! Commands may not work!", e);
         }
     }
 
