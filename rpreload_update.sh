@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Minecraft resource pack compiler and assembler - rpBuild - Build system for Minecraft resource packs.
+# rpreload - Resource pack management made easy.
 # Copyright (c) 2015, Matej Kormuth <http://www.github.com/dobrakmato>
 # All rights reserved.
 #
@@ -25,8 +25,6 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# "Minecraft" is a trademark of Mojang AB
-#
 
 
 # ------ Script settings. ------
@@ -43,7 +41,7 @@ echo " Backing up old rpreload jar ($DESIRED_NAME)..."
 mv $DESIRED_NAME $DESIRED_NAME.bak
 fi
 echo " Downloading new rpreload jar from maven repo..."
-wget -4 -q http://repo.matejkormuth.eu/eu/matejkormuth/starving/rpreload/$DESIRED_VERSION/rpreload-$DESIRED_VERSION-jar-with-dependencies.jar
+wget -4 -q http://repo.matejkormuth.eu/eu/matejkormuth/rpreload/$DESIRED_VERSION/rpreload-$DESIRED_VERSION-jar-with-dependencies.jar
 echo " Renaming downloaded artifact to desired name..."
 mv rpreload-$DESIRED_VERSION-jar-with-dependencies.jar $DESIRED_NAME
 chmod +x $DESIRED_NAME

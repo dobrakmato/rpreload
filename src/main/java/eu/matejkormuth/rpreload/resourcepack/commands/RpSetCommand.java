@@ -29,6 +29,7 @@ package eu.matejkormuth.rpreload.resourcepack.commands;
 import eu.matejkormuth.bmboot.facades.Container;
 import eu.matejkormuth.rpreload.commands.Command;
 import eu.matejkormuth.rpreload.commands.CommandArgs;
+import eu.matejkormuth.rpreload.configuration.ConfigurationsModule;
 import eu.matejkormuth.rpreload.resourcepack.ResourcePackApplier;
 import eu.matejkormuth.rpreload.resourcepack.ResourcePackModule;
 import org.bukkit.ChatColor;
@@ -47,6 +48,9 @@ public class RpSetCommand extends Command {
                 Container.get(ResourcePackModule.class)
                         .getPlayerPacks()
                         .set(((Player) sender).getUniqueId().toString(), rpName);
+                // Save players configuration.
+                Container.get(ConfigurationsModule.class).save("players", Container.get(ResourcePackModule.class)
+                        .getPlayerPacks());
                 // Set desired resource pack in this session.
                 Container.get(ResourcePackApplier.class).apply((Player) sender, true);
                 sender.sendMessage(ChatColor.GREEN + "Resource pack set.");

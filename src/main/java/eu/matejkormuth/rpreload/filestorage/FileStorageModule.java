@@ -54,7 +54,7 @@ public class FileStorageModule extends Module {
         safeMkdirs(dataFolder);
     }
 
-    private void safeMkdirs(Path path) {
+    private static void safeMkdirs(Path path) {
         try {
             Files.createDirectories(path);
         } catch (IOException e) {

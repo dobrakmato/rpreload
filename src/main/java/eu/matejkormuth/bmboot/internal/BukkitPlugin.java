@@ -41,10 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public final class BukkitPlugin extends JavaPlugin {
 
@@ -198,7 +195,11 @@ public final class BukkitPlugin extends JavaPlugin {
                 // Check if all dependencies of M are enabled.
                 boolean dependenciesSatisfied = true;
                 for (Class<? extends Module> dependencyModuleClass : m.getDependencies()) {
-                    Module dependencyModule = container.get(dependencyModuleClass);
+                    Optional<? extends Module> dependencyModuleOpt = container.optional(dependencyModuleClass);
+                    Module dependencyModule = null;
+                    if (dependencyModuleOpt.isPresent()) {
+                        dependencyModule = dependencyModuleOpt.get();
+                    }
 
                     if (dependencyModule == null) {
                         log.error("Module {} declares reference to non-existing (not registered) module {}!",
